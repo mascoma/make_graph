@@ -8,12 +8,7 @@ readlen = read.table("/Users/Xin/Desktop/IC_project/output/ICC_DS2_CLC_mapping_o
 readassigned = read.table("/Users/Xin/Desktop/IC_project/output/Jan222016/resource_tables/ICC_DS2_1_unmapped_taxa.csv", sep = ',', header = T)
  
 
-
-#subgroup1 = readsum[!(rownames(readsum) %in% readgroup1), ] # no hits in diafast
-#hist(subgroup1, breaks = (max(subgroup1) - min(subgroup1)), xlab = "length of reads", 
-#     ylab = "counts", main = "")
-#length(readgroup1) #471118
-#length(subgroup1) #1522666
+ 
 
 assignedlen = readlen[which(readlen[,"read"] %in% readassigned[, "read"]), ] # no hits in diasens
 length(assignedlen[,1])  
