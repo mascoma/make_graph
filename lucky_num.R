@@ -1,7 +1,19 @@
 library(dplyr)
 library(reshape2)
 library(ggplot2)
-pn = read.delim("/Users/Xin/Desktop/datagame/winnums-text.csv", header = T, sep = ',')
+library(RCurl)
+library(splitstackshape)
+# check how to directly fetch file from internet
+URL = "http://www.powerball.com/powerball/winnums-text.txt"
+x = getURL(URL)
+dat = read.delim(textConnection(x), header = F, sep="")
+pn = dat[-1,2:8]
+names(pn) = c("wb1", "wb2", "wb3", "wb4", "wb5", "rb", "pp")
+v1 = dat[-1,1] 
+v1 = cSplit(as.data.table(v1),splitCols="v1",sep = "/")
+names(v1) = c("mm", "dd", "yy")
+pn = cbind(v1, pn)
+
 wb = melt(pn[,4:8])
 wb_count = tally(group_by(wb, value), sort = T)
 percent = (wb_count[,2]/sum(wb_count[,2]))*100
