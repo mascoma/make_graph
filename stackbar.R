@@ -1,5 +1,4 @@
 library(ggplot2)
-library(gcookbook) # For the data set
 library(plyr)
 input <- "/Users/Xin/Desktop/projects/K_methy_project/oldfiles/MethylationRegionsChart.csv"
 output <- "/Users/Xin/Documents/data_visulization/methchart.png"
