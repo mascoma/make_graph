@@ -1,0 +1,61 @@
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(RCurl)
+library(splitstackshape)
+
+URL <- "http://www.powerball.com/powerball/winnums-text.txt"
+outputdir <- "/Users/Xin/Documents/data_visulization/lucky_num.png"
+x <- getURL(URL)
+dat <- read.delim(textConnection(x), stringsAsFactors = F, header = F, sep = "")
+pn <- dat[-1,2:8]
+names(pn) <- c("wb1", "wb2", "wb3", "wb4", "wb5", "rb", "pp")
+v1 <- dat[-1,1] 
+v1 <- cSplit(as.data.table(v1), splitCols="v1", sep = "/")
+v1 <- as.data.frame(v1)
+names(v1) <- c("mm", "dd", "yy")
+pn <- cbind(v1, pn)
+wb <- stack(as.data.table(pn[, 4:8]))
+wb_count <- tally(group_by(wb, values), sort = T)
+names(wb_count) <- c("num", "count")
+percent <- (wb_count[, 2]/sum(wb_count[, 2]))*100
+names(percent) <- "weight"
+wb_count <- cbind(wb_count, percent, group = "wb")
+wb_count <- as.data.frame(wb_count)
+
+rb <- as.data.frame(pn[, 9])
+names(rb) <- "values"
+rb_count <- tally(group_by(rb, values), sort = T)
+names(rb_count) <- c("num", "count")
+percent2 <- (rb_count[, 2]/sum(rb_count[, 2]))*100
+names(percent2) <- "weight"
+rb_count <- cbind(rb_count, percent2, group = "rb")
+rb_count <- as.data.frame(rb_count)
+pb_count <- rbind(wb_count, rb_count)
+dist <- sqrt((as.integer(pb_count[, 1]))^2 + (pb_count[, 2])^2)
+pb_count <- cbind(pb_count, dist)
+
+g <- ggplot(pb_count, aes(x = dist, y = num, size = weight, group = group)) +
+  stat_density2d(alpha = 0.2) +
+  geom_line(aes(color = weight), alpha = 0.2) +
+  geom_point(aes(color = weight, shape = group), 
+             alpha = 0.2) +
+  scale_shape_manual(values = c(15, 18)) +
+  scale_colour_gradientn(colours = c("red", "green", "purple"))+
+  theme(panel.background = element_rect(fill = "black"), 
+        axis.text.x = element_text(face = "bold", color ="gray18" , 
+                                   size = 5, angle = 45 ),
+        axis.text.y = element_text(face = "bold", color = "gray18", 
+                                   size = 5, angle = 45 ),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "none") + xlab("") + ylab("")  
+g
+
+ggsave(outputdir, plot = g, dpi = 600)
+
+
+
+

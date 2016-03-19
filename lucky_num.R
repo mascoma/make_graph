@@ -3,7 +3,7 @@ library(reshape2)
 library(ggplot2)
 library(RCurl)
 library(splitstackshape)
-# check how to directly fetch file from internet
+
 URL = "http://www.powerball.com/powerball/winnums-text.txt"
 x = getURL(URL)
 dat = read.delim(textConnection(x), header = F, sep="")
